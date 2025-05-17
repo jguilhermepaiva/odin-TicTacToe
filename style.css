@@ -1,0 +1,49 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+  background: #f0f0f0;
+}
+
+.game-container {
+  text-align: center;
+}
+
+.player-inputs {
+  margin-bottom: 10px;
+}
+
+input {
+  margin: 5px;
+  padding: 5px;
+  font-size: 1rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 80px);
+  gap: 5px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.message {
+  font-size: 1.2rem;
+  margin-top: 15px;
+  font-weight: bold;
+}
