@@ -1,86 +1,96 @@
-const Gameboard = (() => {
-    let board = [
-        "", "", "",
-        "", "", "",
-        "", "", "",
-    ];
+class Gameboard{
+    constructor() {
+        this.board = Array(9).fill("");
+    }
 
-    const getBoard = () => board;
+    getBoard(){
+        return this.board;
+    }
 
-    const setMark = (index, mark) => {
-        if (board[index] === "") {
-            board[index] = mark;
+    setMark(index, mark){
+        if (this.board[index] ===""){
+            this.board[index] = mark;
             return true;
         }
         return false;
-    };
+    }
 
-    const resetBoard = () => {
-        board = ["", "", "", "", "", "", "", "", ""];
-    };
+    resetBoard(){
+        this.board = Array(9).fill("");
+    }
 
-    const render = () => {
+    render(){
         const boardContainer = document.querySelector(".board");
         boardContainer.innerHTML = "";
-        board.forEach((cell, index) => {
+        this.board.forEach((cell, index) => {
             const cellElement = document.createElement('div');
             cellElement.classList.add("cell");
             cellElement.textContent = cell;
             cellElement.dataset.index = index;
             boardContainer.appendChild(cellElement);
         });
-        addCellListeners(); 
-    };
+        this.addCellListeners(); 
+    }
 
-    const addCellListeners = () => {
+    addCellListeners() {
         const cells = document.querySelectorAll(".cell");
         cells.forEach(cell => {
-            cell.addEventListener("click", GameController.handleCellClick);
+            cell.addEventListener("click", gameController.handleCellClick);
         });
     };
+}
 
-    return { getBoard, setMark, resetBoard, render };
-})();
+const gameboard = new Gameboard();
 
-const Player = (name, marker) => {
-    return {name, marker};
-};
+class Player {
+    constructor(name, marker) {
+        this.name = name;
+        this.marker = marker;
+    }
+}
 
-const GameController = (() =>{
-    let player1 = Player("Player 1", "X");
-    let player2 = Player("Player 2", "O");
-    let currentPlayer = player1;
-    let gameOver = false;
-    let gameActive = false;
+class GameController {
+    constructor(gameboard){
+        this.gameboard = gameboard;
+        this.player1 = new Player("Player 1", "X");
+        this.player2 = new Player("Player 2", "O");
+        this.currentPlayer = this.player1;
+        this.gameOver = false;
+        this.gameActive = false;
 
-    const startGame = () => {
+        this.handleCellClick = this.handleCellClick.bind(this);
+
+    }
+
+    startGame() {
         const name1 = document.getElementById("player1-name").value;
         const name2 = document.getElementById("player2-name").value;
         
-        player1 = Player(name1, "X");
-        player2 = Player(name2, "O");
+        this.player1 = new Player(name1, "X");
+        this.player2 = new Player(name2, "O");
 
-        currentPlayer = player1;
-        gameOver = false;
+        this.currentPlayer = this.player1;
+        this.gameOver = false;
+
 
         if(name1 ==="" || name2 ===""){
-            displayMessage(`please insert the players name`)
+            this.displayMessage(`please insert the players name`)
             return;
         } else{
-            displayMessage(`${currentPlayer.name}'s turn`);
-            gameActive = true;
+            this.displayMessage(`${this.currentPlayer.name}'s turn`);
+            this.gameActive = true;
         }
 
-        Gameboard.resetBoard();
-        Gameboard.render();
+        this.gameboard.resetBoard();
+        this.gameboard.render();
     };
 
-    const switchPlayer = () => {
-    currentPlayer = currentPlayer === player1 ? player2 : player1;
+    switchPlayer(){
+    this.currentPlayer = this.currentPlayer === this.player1 ? this.player2 : this.player1;
     };
 
-    const checkWinner = () => {
-    const board = Gameboard.getBoard();
+    checkWinner(){
+    const board = this.gameboard.getBoard();
     const winCombos = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
         [0, 3, 6], [1, 4, 7], [2, 5, 8],
@@ -97,66 +107,67 @@ const GameController = (() =>{
     return false;
     };
 
-    const isTie = () => Gameboard.getBoard().every(cell => cell !== "");
+    isTie() {
+       return this.gameboard.getBoard().every(cell => cell !== "");
+    }
 
 
+    handleCellClick(e){
 
-    const handleCellClick = (e) => {
+        const index = parseInt(e.target.dataset.index);
 
-        const index = e.target.dataset.index;
-
-        if (!gameActive || gameOver || e.target.textContent !== "") return;
+        if (!this.gameActive || this.gameOver || e.target.textContent !== "") return;
 
 
-        if (Gameboard.setMark(index, currentPlayer.marker)) {
-            Gameboard.render();
+        if (this.gameboard.setMark(index, this.currentPlayer.marker)) {
+            this.gameboard.render();
 
-            if (checkWinner()) {
-                displayMessage(`${currentPlayer.name} wins!`);
+            if (this.checkWinner()) {
+                this.displayMessage(`${this.currentPlayer.name} wins!`);
                 document.getElementById("start").style.display = "none";
-                gameOver = true;
-                gameActive = false;
+                this.gameOver = true;
+                this.gameActive = false;
                 return;
 
-            } else if (Gameboard.getBoard().every(cell => cell !== "")) {
-                displayMessage("It's a tie!");
-                gameOver = true;
-                gameActive = false;
+            } else if (this.isTie()) {
+                this.displayMessage("It's a tie!");
+                this.gameOver = true;
+                this.gameActive = false;
                 return;
 
             }
             
-            switchPlayer();
-            displayMessage(`${currentPlayer.name}'s turn`);
+            this.switchPlayer();
+            this.displayMessage(`${this.currentPlayer.name}'s turn`);
         }
     };
 
-     const displayMessage = (msg) => {
+  displayMessage(msg){
     document.querySelector(".message").textContent = msg;
   };
 
-  const resetGame = () => {
-    Gameboard.resetBoard();
-    currentPlayer = player1;
-    gameOver = false;
-    gameActive = false;
+  resetGame() {
+    this.gameboard.resetBoard();
+    this.currentPlayer = this.player1;
+    this.gameOver = false;
+    this.gameActive = false;
     document.getElementById("start").style.display = "block";
-    displayMessage(``);
-    Gameboard.render();
+    this.displayMessage(``);
+    this.gameboard.render();
   };
 
-    return { startGame, resetGame, handleCellClick};
-}) ();
+};
+const gameController = new GameController(gameboard);
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  Gameboard.render();
+  gameboard.render();
 
   document.getElementById("reset").addEventListener("click", () => {
-    GameController.resetGame();
+    gameController.resetGame();
   });
 
   document.getElementById("start").addEventListener('click', () =>{
-    GameController.startGame();
+    gameController.startGame();
   })
 });
